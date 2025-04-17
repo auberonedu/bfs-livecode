@@ -1,7 +1,10 @@
+import java.util.*;
+
 public class Search {
-     /**
+    /**
      * Finds the location of the nearest reachable cheese from the rat's position.
-     * Returns a 2-element int array: [row, col] of the closest 'c'. If there are multiple
+     * Returns a 2-element int array: [row, col] of the closest 'c'. If there are
+     * multiple
      * cheeses that are tied for the same shortest distance to reach, return
      * any one of them.
      * 
@@ -24,11 +27,97 @@ public class Search {
      *
      * @param maze 2D char array representing the maze
      * @return int[] location of the closest cheese in row, column format
-     * @throws EscapedRatException if there is no rat in the maze
+     * @throws EscapedRatException  if there is no rat in the maze
      * @throws CrowdedMazeException if there is more than one rat in the maze
-     * @throws HungryRatException if there is no reachable cheese
+     * @throws HungryRatException   if there is no reachable cheese
      */
-    public static int[] nearestCheese(char[][] maze) throws EscapedRatException, CrowdedMazeException, HungryRatException {
-        return null;
+    public static int[] nearestCheese(char[][] maze)
+            throws EscapedRatException, CrowdedMazeException, HungryRatException {
+        int[] ratStart = findTheRat(maze);
+
+        Queue<int[]> qRat = new LinkedList<>();
+
+        qRat.add(ratStart);
+
+        boolean[][] visited = new boolean[maze.length][maze[0].length];
+
+        while (!qRat.isEmpty()) {
+            int[] current = qRat.poll();
+            int curR = current[0];
+            int curC = current[1];
+
+            if (maze[curR][curC] == 'c')
+                return current;
+
+            // if(visited[curR][curC]) continue;
+
+            // visited[curR][curC] = true;
+
+            // List<int[]> nextMoves = possibleMoves(maze, current);
+            // //Queue has this .addAll() that adds all
+            // //from int[] nextMoves
+            // qRat.addAll(nextMoves);
+
+            // by running the visited check before enqueueing we avoid
+            // adding already visited cell contents to the queue
+            // thus making this run more efficiently
+            for (int[] move : possibleMoves(maze, current)) {
+                int r = move[0], c = move[1];
+                if (!visited[r][c]) {
+                    visited[r][c] = true;
+                    qRat.add(move);
+                }
+            }
+
+        }
+        throw new HungryRatException();
+    }
+
+    public static int[] findTheRat(char[][] maze) throws CrowdedMazeException, EscapedRatException {
+        int ratCount = 0;
+        int[] ratLocation = null;
+
+        for (int r = 0; r < maze.length; r++) {
+            for (int c = 0; c < maze[0].length; c++) {
+                if (maze[r][c] == 'R') {
+                    ratLocation = new int[] { r, c };
+                    ratCount++;
+                }
+
+            }
+        }
+        if (ratCount > 1)
+            throw new CrowdedMazeException();
+        if (ratCount == 0)
+            throw new EscapedRatException();
+
+        return ratLocation;
+    }
+
+    public static List<int[]> possibleMoves(char[][] maze, int[] currentLocation) {
+        List<int[]> moves = new ArrayList<>();
+        int[][] steps = {
+                { 1, 0 },
+                { -1, 0 },
+                { 0, 1 },
+                { 0, -1 }
+        };
+
+        int curR = currentLocation[0];
+        int curC = currentLocation[1];
+
+        for (int[] step : steps) {
+            int newR = curR + step[0];
+            int newC = curC + step[1];
+
+            if (newR >= 0 && newR < maze.length && newC >= 0 && newC < maze[0].length && maze[newR][newC] != 'w') {
+                moves.add(new int[] { newR, newC });
+            }
+        }
+        return moves;
+    }
+
+    public static void main(String[] args) {
+
     }
 }
