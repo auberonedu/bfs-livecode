@@ -1,3 +1,8 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 public class Search {
      /**
      * Finds the location of the nearest reachable cheese from the rat's position.
@@ -29,6 +34,90 @@ public class Search {
      * @throws HungryRatException if there is no reachable cheese
      */
     public static int[] nearestCheese(char[][] maze) throws EscapedRatException, CrowdedMazeException, HungryRatException {
-        return null;
+        int[] ratLocation = ratLocation(maze);
+
+        Queue<int[]> queue = new LinkedList<>();
+
+        queue.add(ratLocation);
+
+        boolean[][] visited = new boolean[maze.length][maze[0].length];
+
+        while(!queue.isEmpty()){
+            int[] current = queue.poll();
+            int curR = current[0];
+            int curC = current[1];
+
+            if(maze[curR][curC] == 'c'){
+                return current;
+            }
+
+            if(visited[curR][curC]){
+                continue;
+            }
+
+            visited[curR][curC] = true;
+
+            List<int[]> moves = possibleMoves(maze, current);
+
+            queue.addAll(moves);
+
+
+
+
+        }
+
+        throw new HungryRatException();
+
+    }
+
+    public static List<int[]> possibleMoves(char[][] maze, int[] current){
+        
+        List<int[]> moves = new ArrayList<>();
+
+        int[][] steps = {
+            {1,0},
+            {-1,0},
+            {0,1},
+            {0, -1}
+        };
+
+        int curR = current[0];
+        int curC = current[1];
+
+        for(int[] step : steps){
+            int newR = curR + step[0];
+            int newC = curC + step[1];
+
+            if(newR >= 0 && newR < maze.length && newC >= 0 && newC < maze[0].length && maze[newR][newC] != 'w'){
+                moves.add(new int[] {newR, newC});
+            }
+        }
+
+        return moves;
+
+    }
+
+    public static int[] ratLocation(char[][] maze) throws CrowdedMazeException, EscapedRatException {
+        int ratCount = 0;
+        int[] ratLocation = null;
+
+        for(int row = 0; row < maze.length; row++){
+            for(int col = 0; col < maze[0].length; col++){
+                if(maze[row][col] == 'R'){
+                    ratLocation = new int[] {row, col};
+                    ratCount++;
+                }
+            }
+        }
+
+        if(ratCount > 1){
+            throw new CrowdedMazeException();
+        }
+        if(ratCount == 0){
+            throw new EscapedRatException();
+        }
+
+        return ratLocation;
+
     }
 }
