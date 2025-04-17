@@ -1,3 +1,8 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 public class Search {
      /**
      * Finds the location of the nearest reachable cheese from the rat's position.
@@ -29,6 +34,83 @@ public class Search {
      * @throws HungryRatException if there is no reachable cheese
      */
     public static int[] nearestCheese(char[][] maze) throws EscapedRatException, CrowdedMazeException, HungryRatException {
-        return null;
+        int[] start = ratFinder(maze);
+
+        Queue<int[]> queue = new LinkedList<>();
+
+        queue.add(start);
+
+        boolean[][] visited = new boolean[maze.length][maze[0].length];
+
+        while(!queue.isEmpty()){
+            int[] current = queue.poll();
+            int curR = current[0];
+            int curC = current[1];
+            
+            if(maze[curR][curC] == 'C'){
+                return current;
+            }
+
+            if(visited[curR][curC]){
+                continue;
+            }
+
+        visited[curR][curC] = true;
+
+        List<int[]> nextMoves = possibleMoves(maze, current);
+        queue.addAll(nextMoves);
+        }
+
+        throw new HungryRatException();
+    }
+
+    public static int[] ratFinder(char[][] maze) throws EscapedRatException, CrowdedMazeException {
+
+        int ratCount = 0;
+        int[] ratLocation = null;
+
+        for(int r = 0; r < maze.length; r++){
+            for(int c = 0; c < maze[0].length; c++){
+                if(maze[r][c] == 'R' ){
+                    ratLocation = new int[]{r,c};
+                    ratCount++;
+                }
+                
+            }
+        }
+
+        if(ratCount == 0)throw new CrowdedMazeException();
+        if (ratCount > 0) throw new CrowdedMazeException();
+
+        return ratLocation;
+
+
+    }
+
+    public static List<int[]> possibleMoves(char[][]maze, int[] currentLoc){
+        
+        List<int[]> moves = new ArrayList<>();
+        int[][] steps = {
+            {1,0},
+            {-1,0},
+            {0,1},
+            {0,-1},
+        };
+
+        int curR = currentLoc[0];
+        int curC = currentLoc[1];
+
+        for(int[] step : steps){
+            int newR = curR + step[0];
+            int newC = curR + step[1];
+
+            if(newR >= 0 && newR <maze.length &&
+            newC >= 0 && newC < maze[0].length &&
+            maze[newR][newC] != 'w'){
+                moves.add(new int[]{newR, newC});
+            }
+        }
+        return moves;
+
     }
 }
