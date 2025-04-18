@@ -98,7 +98,7 @@ public class Search {
         int[] ratLocation = null;
 
         for(int r = 0; r < maze.length; r++) {
-            for(int c = 0; c < maze.length; c++) {
+            for(int c = 0; c < maze[0].length; c++) {
                 if(maze[r][c] == 'R') {
                     ratCount++;
                     ratLocation = new int[]{r, c};
